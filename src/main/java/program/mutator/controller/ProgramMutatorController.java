@@ -13,6 +13,9 @@ import java.util.List;
 
 import program.mutator.helpers.InequalityHelper;
 import program.mutator.pojos.MutatedFile;
+import program.mutator.pojos.MutatedFileOutput;
+import program.mutator.pojos.ScriptOutput;
+import program.mutator.pojos.TestCaseOutput;
 
 public class ProgramMutatorController {
 	public static final String path_bash = "C:/Path/to/Git/bin/bash.exe";
@@ -58,9 +61,10 @@ public class ProgramMutatorController {
 		}
 		
 		//run mutated files
-		ArrayList<List<List<String>>> outputs = new ArrayList<List<List<String>>>();
+		ScriptOutput scriptOutput = new ScriptOutput();
 		for(int i = 0; i < this.inputs.size(); i++){
 			ArrayList<String> output = runMutatedFiles(this.inputs.get(i));
+			scriptOutput.getTestCaseOutputs().add(new TestCaseOutput());
 			
 			//there was a problem in executing mutated files
 			if(output == null || "err".equals(output.get(0))) {
@@ -71,14 +75,21 @@ public class ProgramMutatorController {
 				break;
 			} 
 			int count = 0;
+			MutatedFileOutput mutatedFileOutput = new MutatedFileOutput();
 			for(String out : output) {
 				if("Running New File".equals(out)) {
 					count++;
+					if(count > 1) {
+						scriptOutput.getTestCaseOutputs().get(i).getMutatedFileOutput().add(mutatedFileOutput);
+						mutatedFileOutput = new MutatedFileOutput();
+					}
 				} else {
-					outputs.get(i).get(count).add(out);
+					mutatedFileOutput.getFileOutput().add(out);
 				}
 			}
 		}
+		
+		System.out.println(scriptOutput.toString());
 		
 	}
 	
