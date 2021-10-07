@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import program.mutator.helpers.InequalityHelper;
 import program.mutator.pojos.MutatedFile;
@@ -17,9 +20,17 @@ public class ProgramMutatorController {
 	private String programName = "PrimeTest";
 	private String programEnding = ".java";
 	private Path fullProgramPath = Paths.get(pathOfProgram + programName + programEnding);
+	private ArrayList<List<String>> inputs = new ArrayList<List<String>>();
+	private ArrayList<String> expected = new ArrayList<String>(Arrays.asList("6 is not a prime number.", "9 is not a prime number.", "5 is a prime number."));
 	private boolean inClass = false;
 	
 	public ProgramMutatorController() {
+		//initialize inputs (will be done by gui
+		this.inputs.add(Arrays.asList("6"));
+		this.inputs.add(Arrays.asList("9"));
+		this.inputs.add(Arrays.asList("5"));
+		
+		
 		//get file to mutate and initialize process
 		File f = fullProgramPath.toFile();
 		
@@ -39,6 +50,7 @@ public class ProgramMutatorController {
 					if(InequalityHelper.lineHasInequality(line)) {
 						for(String mutatedLine : InequalityHelper.mutateLine(line)) {
 							new MutatedFile(lineNumber, mutatedLine);
+							System.out.println(mutatedLine);
 						}
 					}
 				}
@@ -46,16 +58,37 @@ public class ProgramMutatorController {
 		}
 		
 		//run mutated files
-		runMutatedFiles();
-		//System.out.println(readFileTxt());
+		ArrayList<List<String>> outputs = new ArrayList<List<String>>();
+		for(int i = 0; i < this.inputs.size(); i++){
+			ArrayList<String> output = runMutatedFiles(this.inputs.get(i));
+			
+			//there was a problem in executing mutated files
+			if(output == null || "err".equals(output.get(0))) {
+				//notify user of problem and restart process
+				for(String out : output) {
+					System.out.println(out);
+				}
+				break;
+			} 
+			
+			for(String out : output) {
+				System.out.println(out);	
+			}
+		}
+		
 	}
 	
-	private void runMutatedFiles() {
+	private ArrayList<String> runMutatedFiles(List<String> inputs) {
 		try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            String command = "sh " + System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/calculate-mutation-score.sh " + MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1);
+            StringBuilder arrayToPass = new StringBuilder();
+            for(String input : inputs) {
+            	arrayToPass.append(input + " ");
+            }
+            String command = "sh " + System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/calculate-mutation-score.sh " + MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1) + " " + arrayToPass;
             processBuilder.command(path_bash, "-c", command);
 
+            System.out.println("STARTING PROCESS................");
             Process process = processBuilder.start();
 
             BufferedReader reader = new BufferedReader(
@@ -63,28 +96,28 @@ public class ProgramMutatorController {
             BufferedReader errReader = new BufferedReader(
                     new InputStreamReader(process.getErrorStream()));
             String line;
-            StringBuilder output = new StringBuilder();
+            ArrayList<String> output = new ArrayList<String>();
             while ((line = reader.readLine()) != null) {
-                output.append(line + "\n");
+                output.add(line + "\n");
             }
             String errLine;
-            StringBuilder errOutput = new StringBuilder();
+            ArrayList<String> errOutput = new ArrayList<String>(Arrays.asList("err"));
             while ((errLine = errReader.readLine()) != null) {
-            	errOutput.append(errLine + "\n");
+            	errOutput.add(errLine + "\n");
             }
             int exitVal = process.waitFor();
             if (exitVal == 0) {
                 System.out.println(" --- Files run successfully");
-                System.out.println(output);
-
+                return output;
             } else {
                 System.out.println(" --- Files run unsuccessfully");
-                System.out.println(errOutput);
+                return errOutput;
             }
         } catch (IOException | InterruptedException e) {
             System.out.println(" --- Interruption in RunCommand: " + e);
             // Restore interrupted state
             Thread.currentThread().interrupt();
+            return null;
         }
 	}
 
