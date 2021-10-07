@@ -58,7 +58,7 @@ public class ProgramMutatorController {
 		}
 		
 		//run mutated files
-		ArrayList<List<String>> outputs = new ArrayList<List<String>>();
+		ArrayList<List<List<String>>> outputs = new ArrayList<List<List<String>>>();
 		for(int i = 0; i < this.inputs.size(); i++){
 			ArrayList<String> output = runMutatedFiles(this.inputs.get(i));
 			
@@ -70,9 +70,13 @@ public class ProgramMutatorController {
 				}
 				break;
 			} 
-			
+			int count = 0;
 			for(String out : output) {
-				System.out.println(out);	
+				if("Running New File".equals(out)) {
+					count++;
+				} else {
+					outputs.get(i).get(count).add(out);
+				}
 			}
 		}
 		
@@ -98,12 +102,19 @@ public class ProgramMutatorController {
             String line;
             ArrayList<String> output = new ArrayList<String>();
             while ((line = reader.readLine()) != null) {
-                output.add(line + "\n");
+            	//make sure to not get repeating lines
+            	if(output.size() > 0) {
+            		if(!(line).equals(output.get(output.size() - 1))) {
+	            		output.add(line);
+            		}
+            	} else {
+            		output.add(line);
+            	}
             }
             String errLine;
             ArrayList<String> errOutput = new ArrayList<String>(Arrays.asList("err"));
             while ((errLine = errReader.readLine()) != null) {
-            	errOutput.add(errLine + "\n");
+            	errOutput.add(errLine);
             }
             int exitVal = process.waitFor();
             if (exitVal == 0) {
