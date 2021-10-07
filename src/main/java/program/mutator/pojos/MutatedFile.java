@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 
 public class MutatedFile {
-	private static String filePath;
+	public static String filePath;
 	private String fileName;
 	private static String originalFilePath;
 	private static String originalFileName;
@@ -28,7 +28,7 @@ public class MutatedFile {
 		MutatedFile.originalFilePath = originalPath;
 		MutatedFile.originalFileName = programName;
 		MutatedFile.fileType = fileType;
-		MutatedFile.filePath = MutatedFile.originalFilePath + "mutatedFiles\\";
+		MutatedFile.filePath = MutatedFile.originalFilePath + "mutatedFiles/";
 	}
 	
 	public MutatedFile(int mutationNumber, int lineMutated, String mutatedLine) {
@@ -114,7 +114,12 @@ public class MutatedFile {
 			StringBuilder mutatedFileContentStringBuilder = new StringBuilder();
 			
 			for(String mutatedLine : this.mutatedFileLines) {
-				mutatedFileContentStringBuilder.append(mutatedLine + "\n");
+				if(!mutatedLine.startsWith("package")) {
+					if(mutatedLine.contains(originalFileName) && mutatedLine.contains("class")) {
+						mutatedLine = mutatedLine.replace(originalFileName, this.fileName);
+					}
+					mutatedFileContentStringBuilder.append(mutatedLine + "\n");
+				}
 			}
 			
 			//make sure there is an empty folder for mutated files

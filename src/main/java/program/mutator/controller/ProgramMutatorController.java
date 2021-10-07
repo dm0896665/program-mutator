@@ -2,27 +2,35 @@ package program.mutator.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 
 import program.mutator.helpers.InequalityHelper;
 import program.mutator.pojos.MutatedFile;
 
 public class ProgramMutatorController {
-	private String pathOfProgram = "C:\\Path\\to\\file\\";
+	public static final String path_bash = "C:/Path/to/Git/bin/bash.exe";
+	private String pathOfProgram = "C:/Path/to/file/";
 	private String programName = "PrimeTest";
 	private String programEnding = ".java";
 	private Path fullProgramPath = Paths.get(pathOfProgram + programName + programEnding);
 	private boolean inClass = false;
 	
 	public ProgramMutatorController() {
+		//get file to mutate and initialize process
 		File f = fullProgramPath.toFile();
 		
 		getFileLinesFromFile(f);
 		MutatedFile.initializePaths(pathOfProgram, programName, programEnding);
 		
+		//create mutated files
 		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
 			String line = MutatedFile.originalFileLines.get(i);
 			if(line.contains("class")) {
@@ -43,8 +51,50 @@ public class ProgramMutatorController {
 				}
 			}
 		}
+		
+		//run mutated files
+		runMutatedFiles();
+		//System.out.println(readFileTxt());
 	}
 	
+	private void runMutatedFiles() {
+		try {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            String command = "sh " + System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/calculate-mutation-score.sh " + MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1);
+            processBuilder.command(path_bash, "-c", command);
+
+            Process process = processBuilder.start();
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            BufferedReader errReader = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream()));
+            String line;
+            StringBuilder output = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                output.append(line + "\n");
+            }
+            String errLine;
+            StringBuilder errOutput = new StringBuilder();
+            while ((errLine = errReader.readLine()) != null) {
+            	errOutput.append(errLine + "\n");
+            }
+            int exitVal = process.waitFor();
+            if (exitVal == 0) {
+                System.out.println(" --- Files run successfully");
+                System.out.println(output);
+
+            } else {
+                System.out.println(" --- Files run unsuccessfully");
+                System.out.println(errOutput);
+            }
+        } catch (IOException | InterruptedException e) {
+            System.out.println(" --- Interruption in RunCommand: " + e);
+            // Restore interrupted state
+            Thread.currentThread().interrupt();
+        }
+	}
+
 	private void getFileLinesFromFile(File f) {
 		BufferedReader reader;
 		try {
