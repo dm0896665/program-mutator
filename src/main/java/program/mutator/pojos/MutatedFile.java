@@ -17,7 +17,7 @@ public class MutatedFile {
 	private static String originalFilePath;
 	private static String originalFileName;
 	private static String fileType;
-	private int mutationNumber;
+	private static int mutationNumber = 0;
 	private int lineMutated;
 	private String mutatedLine;
 	public static ArrayList<String> originalFileLines = new ArrayList<String>();
@@ -31,11 +31,12 @@ public class MutatedFile {
 		MutatedFile.filePath = MutatedFile.originalFilePath + "mutatedFiles/";
 	}
 	
-	public MutatedFile(int mutationNumber, int lineMutated, String mutatedLine) {
-		this.mutationNumber = mutationNumber;
-		this.fileName = "Mutation" + this.mutationNumber;
+	public MutatedFile(int lineMutated, String mutatedLine) {
+		MutatedFile.mutationNumber++;
+		this.fileName = "Mutation" + MutatedFile.mutationNumber;
 		this.lineMutated = lineMutated;
 		this.mutatedLine = mutatedLine;
+		mutate();
 	}
 
 	public String getMutatedLine() {
@@ -86,10 +87,6 @@ public class MutatedFile {
 		return mutationNumber;
 	}
 
-	public void setMutationNumber(int mutationNumber) {
-		this.mutationNumber = mutationNumber;
-	}
-
 	public int getLineMutated() {
 		return lineMutated;
 	}
@@ -124,7 +121,7 @@ public class MutatedFile {
 			
 			//make sure there is an empty folder for mutated files
 			Path path = Paths.get(MutatedFile.filePath + this.fileName + MutatedFile.fileType);
-			if(this.mutationNumber == 1) {
+			if(MutatedFile.mutationNumber == 1) {
 				if(new File(MutatedFile.filePath).exists())
 				{
 					FileUtils.deleteDirectory(new File(MutatedFile.filePath));
