@@ -20,7 +20,7 @@ do
 	done
 	>&2 echo "$inputString"
 	
-	echo -n "Running New File"
+	echo "Running New File"
 	
 	echo -ne "$inputString" |java $fileName
 done
