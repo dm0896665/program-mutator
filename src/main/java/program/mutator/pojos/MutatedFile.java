@@ -1,29 +1,43 @@
 package program.mutator.pojos;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FileUtils;
+
 public class MutatedFile {
-	private String filePath;
+	private static String filePath;
+	private String fileName;
+	private static String originalFilePath;
+	private static String originalFileName;
+	private static String fileType;
 	private int mutationNumber;
 	private int lineMutated;
 	private String mutatedLine;
 	public static ArrayList<String> originalFileLines = new ArrayList<String>();
-	public ArrayList<String> mutatedFileLines;
+	public ArrayList<String> mutatedFileLines = new ArrayList<String>();
 	
-	public MutatedFile(String filePath, int lineMutated) {
-		this.filePath = filePath;
-		this.lineMutated = lineMutated;
+	/*MUST BE CALLED AT START OF PROCESS*/
+	public static void initializePaths(String originalPath, String programName, String fileType) {
+		MutatedFile.originalFilePath = originalPath;
+		MutatedFile.originalFileName = programName;
+		MutatedFile.fileType = fileType;
+		MutatedFile.filePath = MutatedFile.originalFilePath + "mutatedFiles\\";
 	}
 	
-	public MutatedFile(String filePath, int mutationNumber, int lineMutated, String mutatedLine,
-			ArrayList<String> mutatedFileLines) {
-		this.filePath = filePath;
+	public MutatedFile(int mutationNumber, int lineMutated, String mutatedLine) {
 		this.mutationNumber = mutationNumber;
+		this.fileName = "Mutation" + this.mutationNumber;
 		this.lineMutated = lineMutated;
 		this.mutatedLine = mutatedLine;
-		this.mutatedFileLines = mutatedFileLines;
 	}
-	
+
 	public String getMutatedLine() {
 		return mutatedLine;
 	}
@@ -45,7 +59,27 @@ public class MutatedFile {
 	}
 
 	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+		MutatedFile.filePath = filePath;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public static void setFileType(String fileType) {
+		MutatedFile.fileType = fileType;
+	}
+
+	public static void setOriginalFilePath(String originalFilePath) {
+		MutatedFile.originalFilePath = originalFilePath;
+	}
+
+	public static void setOriginalFileName(String originalFileName) {
+		MutatedFile.originalFileName = originalFileName;
 	}
 
 	public int getMutationNumber() {
@@ -73,7 +107,34 @@ public class MutatedFile {
 	}
 	
 	public void mutate() {
-		this.mutatedFileLines = MutatedFile.originalFileLines;
-		this.mutatedFileLines.set(this.lineMutated, this.mutatedLine);
+		try {
+			//get content of mutated file
+			this.mutatedFileLines = MutatedFile.originalFileLines;
+			this.mutatedFileLines.set(this.lineMutated - 1, this.mutatedLine);
+			StringBuilder mutatedFileContentStringBuilder = new StringBuilder();
+			
+			for(String mutatedLine : this.mutatedFileLines) {
+				mutatedFileContentStringBuilder.append(mutatedLine + "\n");
+			}
+			
+			//make sure there is an empty folder for mutated files
+			Path path = Paths.get(MutatedFile.filePath + this.fileName + MutatedFile.fileType);
+			if(this.mutationNumber == 1) {
+				if(new File(MutatedFile.filePath).exists())
+				{
+					FileUtils.deleteDirectory(new File(MutatedFile.filePath));
+				}
+				new File(MutatedFile.filePath).mkdirs();
+			}
+			
+			//create mutated file and add it to the path
+			Files.createFile(path);
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.valueOf(path), true));
+	        writer.write(String.valueOf(mutatedFileContentStringBuilder));
+	        writer.flush();
+	        writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

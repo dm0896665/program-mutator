@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import program.mutator.helpers.InequalityHelper;
 import program.mutator.pojos.MutatedFile;
 
 public class ProgramMutatorController {
@@ -20,6 +21,7 @@ public class ProgramMutatorController {
 		File f = fullProgramPath.toFile();
 		
 		getFileLinesFromFile(f);
+		MutatedFile.initializePaths(pathOfProgram, programName, programEnding);
 		
 		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
 			String line = MutatedFile.originalFileLines.get(i);
@@ -28,9 +30,16 @@ public class ProgramMutatorController {
 			}
 			
 			if(inClass) {
+				int mutationCount = 0;
 				if(isLineMutatable(line)) {
 					int lineNumber = i + 1;
-					MutatedFile mutatedFile = new MutatedFile(this.pathOfProgram, lineNumber);
+					if(InequalityHelper.lineHasInequality(line)) {
+						for(String mutatedLine : InequalityHelper.mutateLine(line)) {
+							mutationCount++;
+							MutatedFile mutatedFile = new MutatedFile(mutationCount, lineNumber, mutatedLine);
+							mutatedFile.mutate();
+						}
+					}
 				}
 			}
 		}
@@ -53,9 +62,7 @@ public class ProgramMutatorController {
 		}
 	}
 	
-	private boolean isLineMutatable(String Line) {
-		boolean isMutatable = false;
-		
-		return isMutatable;
+	private boolean isLineMutatable(String line) {
+		return InequalityHelper.lineHasInequality(line);
 	}
 }
