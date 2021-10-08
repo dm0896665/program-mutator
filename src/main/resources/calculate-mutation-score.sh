@@ -12,7 +12,6 @@ do
 	cd $prefix
 	javac $file
 	inputString=""
-	re='^[0-9]+$'
 	for input in "${inputs[@]:1}"
 	do
 		inputString="$inputString$input\n"
