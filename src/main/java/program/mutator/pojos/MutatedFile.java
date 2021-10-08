@@ -16,7 +16,7 @@ public class MutatedFile {
 	private String fileName;
 	private static String originalFilePath;
 	private static String originalFileName;
-	private static String fileType;
+	public static String fileType;
 	private static int mutationNumber = 0;
 	private int lineMutated;
 	private String mutatedLine;

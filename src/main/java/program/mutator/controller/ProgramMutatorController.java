@@ -1,17 +1,24 @@
 package program.mutator.controller;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+
 import program.mutator.helpers.InequalityHelper;
+import program.mutator.pojos.ExpectedOutput;
 import program.mutator.pojos.MutatedFile;
 import program.mutator.pojos.MutatedFileOutput;
 import program.mutator.pojos.MutationScore;
@@ -19,14 +26,15 @@ import program.mutator.pojos.ScriptOutput;
 import program.mutator.pojos.TestCaseOutput;
 
 public class ProgramMutatorController {
-	public static final String path_bash = "C:/Path/to/Git/bin/bash.exe";
-	private String pathOfProgram = "C:/Path/to/file/";
+	public static final String path_bash = "D:/Program Files/Git/bin/bash.exe";
+	private String pathOfProgram = "C:/Users/Dylan/OneDrive/y/College/src/mutation/test/";
 	private String programName = "PrimeTest";
 	private String programEnding = ".java";
 	private Path fullProgramPath = Paths.get(pathOfProgram + programName + programEnding);
 	private ArrayList<List<String>> inputs = new ArrayList<List<String>>();
-	private ArrayList<String> expected = new ArrayList<String>(Arrays.asList("6 is not a prime number.", "9 is not a prime number.", "5 is a prime number."));
+	private ArrayList<ExpectedOutput> expected = new ArrayList<ExpectedOutput>(); //e.g. Arrays.asList("6 is not a prime number.", "9 is not a prime number.", "5 is a prime number.")
 	private boolean inClass = false;
+	private boolean debug = true;
 	
 	public ProgramMutatorController() {
 		//initialize inputs (will be done by gui
@@ -34,46 +42,40 @@ public class ProgramMutatorController {
 		this.inputs.add(Arrays.asList("9"));
 		this.inputs.add(Arrays.asList("5"));
 		
-		
-		//get file to mutate and initialize process
+		//get lines from file
 		File f = fullProgramPath.toFile();
-		
 		getFileLinesFromFile(f);
 		MutatedFile.initializePaths(pathOfProgram, programName, programEnding);
+		createRunnableOriginalProgram();
+		
+		//initialize outputs
+		ScriptOutput originalScriptOutput = findOutputFromFileRun(true);
+		findExpectedOutputFromOriginalScripOutput(originalScriptOutput);
 		
 		//create mutated files
-		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
-			String line = MutatedFile.originalFileLines.get(i);
-			if(line.contains("class")) {
-				inClass = true;
-			}
-			
-			if(inClass) {
-				if(isLineMutatable(line)) {
-					int lineNumber = i + 1;
-					if(InequalityHelper.lineHasInequality(line)) {
-						for(String mutatedLine : InequalityHelper.mutateLine(line)) {
-							new MutatedFile(lineNumber, mutatedLine);
-							System.out.println(mutatedLine);
-						}
-					}
-				}
-			}
-		}
+		createMutatedFiles();
 		
 		//run mutated files
+		ScriptOutput mutatedScriptOutput = findOutputFromFileRun(false);
+		
+		//calculate mutated score
+		calculateMutationScoreFromOutput(mutatedScriptOutput);
+		
+	}
+
+	private ScriptOutput findOutputFromFileRun(boolean runOriginal) {
 		ScriptOutput scriptOutput = new ScriptOutput();
 		for(int i = 0; i < this.inputs.size(); i++){
-			ArrayList<String> output = runMutatedFiles(this.inputs.get(i));
+			ArrayList<String> output = runFiles(this.inputs.get(i), runOriginal);
 			scriptOutput.getTestCaseOutputs().add(new TestCaseOutput());
 			
 			//there was a problem in executing mutated files
 			if(output == null || "err".equals(output.get(0))) {
 				//notify user of problem and restart process
 				for(String out : output) {
-					System.out.println(out);
+					if(debug)System.out.println(out);
 				}
-				break;
+				return null;
 			} 
 			int count = 0;
 			for(String out : output) {
@@ -85,37 +87,18 @@ public class ProgramMutatorController {
 				}
 			}
 		}
-		
-		//calculate mutated score
-		for(int i = 0; i < scriptOutput.getTestCaseOutputs().size(); i++) {
-			TestCaseOutput testCaseOutput = scriptOutput.getTestCaseOutputs().get(i);
-			MutationScore mutationScore = new MutationScore();
-			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {
-				ArrayList<String> fileOutput = mutatedFileOutput.getFileOutput();
-				//System.out.println(fileOutput + " vs '" + expected.get(i) + "' ==>" + fileOutput.contains(expected.get(i)));
-				if(fileOutput.contains(expected.get(i))) {
-					mutationScore.addEquivalentMutants(1);
-				} else {
-					mutationScore.addDeadMutants(1);
-				}
-			}
-			mutationScore.calculateScore();
-			System.out.println(mutationScore);
-		}
-		
+		return scriptOutput;
 	}
 	
-	private ArrayList<String> runMutatedFiles(List<String> inputs) {
+	private ArrayList<String> runFiles(List<String> inputs, boolean runOriginal) {
 		try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            StringBuilder arrayToPass = new StringBuilder();
-            for(String input : inputs) {
-            	arrayToPass.append(input + " ");
-            }
-            String command = "sh " + System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/execute-mutants.sh " + MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1) + " " + arrayToPass;
+            
+            String command = createCommand(inputs, runOriginal);
+            
             processBuilder.command(path_bash, "-c", command);
 
-            System.out.println("STARTING PROCESS................");
+            if(debug)System.out.println("STARTING PROCESS................");
             Process process = processBuilder.start();
 
             BufferedReader reader = new BufferedReader(
@@ -141,18 +124,33 @@ public class ProgramMutatorController {
             }
             int exitVal = process.waitFor();
             if (exitVal == 0) {
-                System.out.println(" --- Files run successfully");
+                if(debug)System.out.println(" --- Files run successfully");
                 return output;
             } else {
-                System.out.println(" --- Files run unsuccessfully");
+                if(debug)System.out.println(" --- Files run unsuccessfully");
                 return errOutput;
             }
         } catch (IOException | InterruptedException e) {
-            System.out.println(" --- Interruption in RunCommand: " + e);
+            if(debug)System.out.println(" --- Interruption in RunCommand: " + e);
             // Restore interrupted state
             Thread.currentThread().interrupt();
             return null;
         }
+	}
+	
+	private String createCommand(List<String> inputs, boolean runOriginal) {
+		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/";
+        String scriptName = ((runOriginal)? "execute-original" : "execute-mutants") + ".sh";
+        String script = scriptPath + scriptName;
+        String pathArg = ((runOriginal)? this.pathOfProgram : MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1));
+        String programName = ((runOriginal)? (this.programName + "Original") : "");
+        StringBuilder arrayToPass = new StringBuilder();
+        for(String input : inputs) {
+        	arrayToPass.append(input + " ");
+        }
+        String scriptArgs = pathArg + " " + programName + " " + arrayToPass;
+        
+        return "sh " + script + " " + scriptArgs;
 	}
 
 	private void getFileLinesFromFile(File f) {
@@ -161,12 +159,92 @@ public class ProgramMutatorController {
 			reader = new BufferedReader(new FileReader(f));
 			String line = reader.readLine();
 			while (line != null) {
-				System.out.println(line);
+				if(debug)System.out.println(line);
 				MutatedFile.originalFileLines.add(line);
 				// read next line
 				line = reader.readLine();
 			}
 			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void createMutatedFiles() {
+		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
+			String line = MutatedFile.originalFileLines.get(i);
+			if(line.contains("class")) {
+				inClass = true;
+			}
+			
+			if(inClass) {
+				if(isLineMutatable(line)) {
+					int lineNumber = i + 1;
+					if(InequalityHelper.lineHasInequality(line)) {
+						for(String mutatedLine : InequalityHelper.mutateLine(line)) {
+							new MutatedFile(lineNumber, mutatedLine);
+							if(debug)System.out.println("Mutated Line=> " + mutatedLine);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void calculateMutationScoreFromOutput(ScriptOutput mutatedScriptOutput) {
+		for(int i = 0; i < mutatedScriptOutput.getTestCaseOutputs().size(); i++) {
+			TestCaseOutput testCaseOutput = mutatedScriptOutput.getTestCaseOutputs().get(i);
+			MutationScore mutationScore = new MutationScore();
+			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {
+				ArrayList<String> fileOutput = mutatedFileOutput.getFileOutput();
+				if(debug)System.out.println(expected.get(i).getAllOutput() + " vs '" + fileOutput + "' ==>" + fileOutput.containsAll(expected.get(i).getAllOutput()));
+				if(fileOutput.containsAll(expected.get(i).getAllOutput())) {
+					mutationScore.addEquivalentMutants(1);
+				} else {
+					mutationScore.addDeadMutants(1);
+				}
+			}
+			mutationScore.calculateScore();
+			if(debug)System.out.println(mutationScore);
+		}
+	}
+	
+	private void findExpectedOutputFromOriginalScripOutput(ScriptOutput originalScriptOutput) {
+		for(int i = 0; i < originalScriptOutput.getTestCaseOutputs().size(); i++) {
+			TestCaseOutput testCaseOutput = originalScriptOutput.getTestCaseOutputs().get(i);
+			MutationScore mutationScore = new MutationScore();
+			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {
+				ArrayList<String> fileOutput = mutatedFileOutput.getFileOutput();
+				this.expected.add(new ExpectedOutput(fileOutput));
+			}
+		}
+	}
+	
+	public void createRunnableOriginalProgram() {
+		try {
+			//get content of original file
+			ArrayList<String> lines = MutatedFile.originalFileLines;
+			StringBuilder originalFileContentStringBuilder = new StringBuilder();
+			String fileName = this.programName + "Original";
+			
+			for(String line : lines) {
+				if(!line.startsWith("package")) {
+					if(line.contains(this.programName) && line.contains("class")) {
+						line = line.replace(this.programName, fileName);
+					}
+					originalFileContentStringBuilder.append(line + "\n");
+				}
+			}
+			
+			//make sure there is an empty folder for mutated files
+			Path path = Paths.get(this.pathOfProgram + fileName + MutatedFile.fileType);
+			
+			//create original file
+			path.toFile().createNewFile();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.valueOf(path), true));
+	        writer.write(String.valueOf(originalFileContentStringBuilder));
+	        writer.flush();
+	        writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
