@@ -19,8 +19,8 @@ import program.mutator.pojos.ScriptOutput;
 import program.mutator.pojos.TestCaseOutput;
 
 public class ProgramMutatorController {
-	public static final String path_bash = "D:/Program Files/Git/bin/bash.exe";
-	private String pathOfProgram = "C:/Users/Dylan/OneDrive/y/College/src/mutation/test/";
+	public static final String path_bash = "C:/Path/to/Git/bin/bash.exe";
+	private String pathOfProgram = "C:/Path/to/file/";
 	private String programName = "PrimeTest";
 	private String programEnding = ".java";
 	private Path fullProgramPath = Paths.get(pathOfProgram + programName + programEnding);
