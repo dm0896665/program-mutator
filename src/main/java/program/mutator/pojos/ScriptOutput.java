@@ -19,9 +19,10 @@ public class ScriptOutput {
 	public void setTestCaseOutputs(ArrayList<TestCaseOutput> testCaseOutputs) {
 		this.testCaseOutputs = testCaseOutputs;
 	}
-	
+
 	@Override
 	public String toString() {
-		return this.testCaseOutputs.toString();
+		return "ScriptOutput [testCaseOutputs=" + testCaseOutputs + "]";
 	}
+	
 }

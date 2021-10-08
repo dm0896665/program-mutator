@@ -14,12 +14,13 @@ import java.util.List;
 import program.mutator.helpers.InequalityHelper;
 import program.mutator.pojos.MutatedFile;
 import program.mutator.pojos.MutatedFileOutput;
+import program.mutator.pojos.MutationScore;
 import program.mutator.pojos.ScriptOutput;
 import program.mutator.pojos.TestCaseOutput;
 
 public class ProgramMutatorController {
-	public static final String path_bash = "C:/Path/to/Git/bin/bash.exe";
-	private String pathOfProgram = "C:/Path/to/file/";
+	public static final String path_bash = "D:/Program Files/Git/bin/bash.exe";
+	private String pathOfProgram = "C:/Users/Dylan/OneDrive/y/College/src/mutation/test/";
 	private String programName = "PrimeTest";
 	private String programEnding = ".java";
 	private Path fullProgramPath = Paths.get(pathOfProgram + programName + programEnding);
@@ -75,21 +76,32 @@ public class ProgramMutatorController {
 				break;
 			} 
 			int count = 0;
-			MutatedFileOutput mutatedFileOutput = new MutatedFileOutput();
 			for(String out : output) {
 				if("Running New File".equals(out)) {
 					count++;
-					if(count > 1) {
-						scriptOutput.getTestCaseOutputs().get(i).getMutatedFileOutput().add(mutatedFileOutput);
-						mutatedFileOutput = new MutatedFileOutput();
-					}
+					scriptOutput.getTestCaseOutputs().get(i).getMutatedFileOutput().add(new MutatedFileOutput());
 				} else {
-					mutatedFileOutput.getFileOutput().add(out);
+					scriptOutput.getTestCaseOutputs().get(i).getMutatedFileOutput().get(count - 1).getFileOutput().add(out);
 				}
 			}
 		}
 		
-		System.out.println(scriptOutput.toString());
+		//calculate mutated score
+		for(int i = 0; i < scriptOutput.getTestCaseOutputs().size(); i++) {
+			TestCaseOutput testCaseOutput = scriptOutput.getTestCaseOutputs().get(i);
+			MutationScore mutationScore = new MutationScore();
+			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {
+				ArrayList<String> fileOutput = mutatedFileOutput.getFileOutput();
+				//System.out.println(fileOutput + " vs '" + expected.get(i) + "' ==>" + fileOutput.contains(expected.get(i)));
+				if(fileOutput.contains(expected.get(i))) {
+					mutationScore.addEquivalentMutants(1);
+				} else {
+					mutationScore.addDeadMutants(1);
+				}
+			}
+			mutationScore.calculateScore();
+			System.out.println(mutationScore);
+		}
 		
 	}
 	

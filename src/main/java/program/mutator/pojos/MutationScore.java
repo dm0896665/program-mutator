@@ -26,11 +26,18 @@ public class MutationScore {
 	public void setDeadMutants(int deadMutants) {
 		this.deadMutants = deadMutants;
 	}
+	public void addDeadMutants(int count) {
+		this.deadMutants+=count;
+		this.totalMutants+=count;
+	}
 	public int getTotalMutants() {
 		return totalMutants;
 	}
 	public void setTotalMutants(int totalMutants) {
 		this.totalMutants = totalMutants;
+	}
+	public void addTotalMutants(int count) {
+		this.totalMutants+=count;
 	}
 	public int getEquivalentMutants() {
 		return equivalentMutants;
@@ -38,10 +45,25 @@ public class MutationScore {
 	public void setEquivalentMutants(int equivalentMutants) {
 		this.equivalentMutants = equivalentMutants;
 	}
+	public void addEquivalentMutants(int count) {
+		this.equivalentMutants+=count;
+		this.totalMutants+=count;
+	}
+	public void calculateScore() {
+		this.score = 100 * (this.deadMutants / (this.totalMutants - this.equivalentMutants));
+	}
 	public double getScore() {
 		return score;
 	}
 	public void setScore(double score) {
 		this.score = score;
 	}
+
+	@Override
+	public String toString() {
+		return "MutationScore [deadMutants=" + deadMutants + ", totalMutants=" + totalMutants + ", equivalentMutants="
+				+ equivalentMutants + ", score=" + score + "]";
+	}
+	
+	
 }

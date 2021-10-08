@@ -22,6 +22,8 @@ public class TestCaseOutput {
 
 	@Override
 	public String toString() {
-		return this.mutatedFileOutput.toString();
+		return "TestCaseOutput [mutatedFileOutput=" + mutatedFileOutput + "]";
 	}
+
+	
 }

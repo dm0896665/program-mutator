@@ -22,6 +22,8 @@ public class MutatedFileOutput {
 
 	@Override
 	public String toString() {
-		return this.fileOutput.toString();
+		return "MutatedFileOutput [fileOutput=" + fileOutput + "]";
 	}
+
+	
 }
