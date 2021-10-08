@@ -112,7 +112,7 @@ public class ProgramMutatorController {
             for(String input : inputs) {
             	arrayToPass.append(input + " ");
             }
-            String command = "sh " + System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/calculate-mutation-score.sh " + MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1) + " " + arrayToPass;
+            String command = "sh " + System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/execute-mutants.sh " + MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1) + " " + arrayToPass;
             processBuilder.command(path_bash, "-c", command);
 
             System.out.println("STARTING PROCESS................");
