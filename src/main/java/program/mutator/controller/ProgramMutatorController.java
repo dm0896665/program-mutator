@@ -18,6 +18,7 @@ import program.mutator.pojos.ExpectedOutput;
 import program.mutator.pojos.MutatedFile;
 import program.mutator.pojos.MutatedFileOutput;
 import program.mutator.pojos.MutationScore;
+import program.mutator.pojos.MutationStatus;
 import program.mutator.pojos.ScriptOutput;
 import program.mutator.pojos.TestCaseOutput;
 
@@ -188,27 +189,42 @@ public class ProgramMutatorController {
 	}
 	
 	private void calculateMutationScoreFromOutput(ScriptOutput mutatedScriptOutput) {
+		//for each test case output
+		MutationScore mutationScore = new MutationScore();
 		for(int i = 0; i < mutatedScriptOutput.getTestCaseOutputs().size(); i++) {
 			TestCaseOutput testCaseOutput = mutatedScriptOutput.getTestCaseOutputs().get(i);
-			MutationScore mutationScore = new MutationScore();
-			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {
+			//for each mutated file output
+			for(int j = 0; j < testCaseOutput.getMutatedFileOutput().size(); j++) {
+				MutatedFileOutput mutatedFileOutput = testCaseOutput.getMutatedFileOutput().get(j);
 				ArrayList<String> fileOutput = mutatedFileOutput.getFileOutput();
 				if(debug)System.out.println(expected.get(i).getAllOutput() + " vs '" + fileOutput + "' ==>" + fileOutput.containsAll(expected.get(i).getAllOutput()));
+				//if the mutated file outputs the same as the original
 				if(fileOutput.containsAll(expected.get(i).getAllOutput())) {
-					mutationScore.addEquivalentMutants(1);
+					//if it's the first run add a new mutation status 
+					if(mutationScore.getMutationStatuses().size() <= j) {
+						mutationScore.getMutationStatuses().add(MutationStatus.EQUIVALENT);
+					}
+				//otherwise the mutant is dead
 				} else {
-					mutationScore.addDeadMutants(1);
+					//if it's the first run add a new mutation status
+					if(mutationScore.getMutationStatuses().size() <= j) {
+						mutationScore.getMutationStatuses().add(MutationStatus.DEAD);
+					} else {
+						//if the mutant hasn't been killed yet, kill it
+						if(!mutationScore.getMutationStatuses().get(j).equals(MutationStatus.DEAD)) {
+							mutationScore.getMutationStatuses().set(j, MutationStatus.DEAD);
+						}
+					}
 				}
 			}
-			mutationScore.calculateScore();
-			if(debug)System.out.println(mutationScore);
 		}
+		mutationScore.calculateOriginalScore();
+		if(debug)System.out.println(mutationScore);
 	}
 	
 	private void findExpectedOutputFromOriginalScripOutput(ScriptOutput originalScriptOutput) {
 		for(int i = 0; i < originalScriptOutput.getTestCaseOutputs().size(); i++) {
 			TestCaseOutput testCaseOutput = originalScriptOutput.getTestCaseOutputs().get(i);
-			MutationScore mutationScore = new MutationScore();
 			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {
 				ArrayList<String> fileOutput = mutatedFileOutput.getFileOutput();
 				this.expected.add(new ExpectedOutput(fileOutput));
