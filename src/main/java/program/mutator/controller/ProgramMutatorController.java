@@ -20,6 +20,7 @@ import program.mutator.pojos.MutatedFileOutput;
 import program.mutator.pojos.MutationScore;
 import program.mutator.pojos.MutationStatus;
 import program.mutator.pojos.ScriptOutput;
+import program.mutator.pojos.ScriptRunOutput;
 import program.mutator.pojos.TestCaseOutput;
 
 public class ProgramMutatorController {
@@ -30,7 +31,6 @@ public class ProgramMutatorController {
 	private Path fullProgramPath = Paths.get(pathOfProgram + programName + programEnding);
 	private ArrayList<List<String>> inputs = new ArrayList<List<String>>();
 	private ArrayList<ExpectedOutput> expected = new ArrayList<ExpectedOutput>(); //e.g. Arrays.asList("6 is not a prime number.", "9 is not a prime number.", "5 is a prime number.")
-	private boolean inClass = false;
 	private boolean debug = true;
 	
 	public ProgramMutatorController() {
@@ -67,16 +67,16 @@ public class ProgramMutatorController {
 			scriptOutput.getTestCaseOutputs().add(new TestCaseOutput());
 			
 			//there was a problem in executing mutated files
-			if(output == null || "err".equals(output.get(0))) {
+			if(output == null || ScriptRunOutput.ERROR.toString().equals(output.get(0))) {
 				//notify user of problem and restart process
 				for(String out : output) {
-					if(debug)System.out.println(out);
+					if(debug)System.out.println("Script Run Error=> " + out);
 				}
 				return null;
 			} 
 			int count = 0;
 			for(String out : output) {
-				if("Running New File".equals(out)) {
+				if(ScriptRunOutput.RUNNING_NEW_FILE.toString().equals(out)) {
 					count++;
 					scriptOutput.getTestCaseOutputs().get(i).getMutatedFileOutput().add(new MutatedFileOutput());
 				} else {
@@ -95,7 +95,7 @@ public class ProgramMutatorController {
             
             processBuilder.command(path_bash, "-c", command);
 
-            if(debug)System.out.println("STARTING PROCESS................");
+            if(debug)System.out.println("STARTING '" + command + "' PROCESS................");
             Process process = processBuilder.start();
 
             BufferedReader reader = new BufferedReader(
@@ -115,16 +115,16 @@ public class ProgramMutatorController {
             	}
             }
             String errLine;
-            ArrayList<String> errOutput = new ArrayList<String>(Arrays.asList("err"));
+            ArrayList<String> errOutput = new ArrayList<String>(Arrays.asList(ScriptRunOutput.ERROR.toString()));
             while ((errLine = errReader.readLine()) != null) {
             	errOutput.add(errLine);
             }
             int exitVal = process.waitFor();
             if (exitVal == 0) {
-                if(debug)System.out.println(" --- Files run successfully");
+                if(debug)System.out.println(" --- '" + command + "' run successfully");
                 return output;
             } else {
-                if(debug)System.out.println(" --- Files run unsuccessfully");
+                if(debug)System.out.println(" --- '" + command + "' run unsuccessfully");
                 return errOutput;
             }
         } catch (IOException | InterruptedException e) {
@@ -168,6 +168,7 @@ public class ProgramMutatorController {
 	}
 	
 	private void createMutatedFiles() {
+		boolean inClass = false;
 		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
 			String line = MutatedFile.originalFileLines.get(i);
 			if(line.contains("class")) {
