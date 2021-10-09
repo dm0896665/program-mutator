@@ -2,6 +2,8 @@ package program.mutator.pojos;
 
 import java.util.ArrayList;
 
+import program.mutator.pojos.enums.MutationStatus;
+
 public class MutationScore {
 	private int deadMutants;
 	private int totalMutants;

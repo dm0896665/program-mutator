@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import program.mutator.helpers.InequalityHelper;
+import program.mutator.helpers.LineMutator;
 import program.mutator.pojos.ExpectedOutput;
 import program.mutator.pojos.MutatedFile;
 import program.mutator.pojos.MutatedFileOutput;
 import program.mutator.pojos.MutationScore;
-import program.mutator.pojos.MutationStatus;
 import program.mutator.pojos.ScriptOutput;
-import program.mutator.pojos.ScriptRunOutput;
 import program.mutator.pojos.TestCaseOutput;
+import program.mutator.pojos.enums.MutationStatus;
+import program.mutator.pojos.enums.ScriptRunOutput;
 
 public class ProgramMutatorController {
 	public static final String path_bash = "C:/Path/to/Git/bin/bash.exe";
@@ -121,10 +121,10 @@ public class ProgramMutatorController {
             }
             int exitVal = process.waitFor();
             if (exitVal == 0) {
-                if(debug)System.out.println(" --- '" + command + "' run successfully");
+                if(debug)System.out.println(" --- '" + command + "' ran successfully");
                 return output;
             } else {
-                if(debug)System.out.println(" --- '" + command + "' run unsuccessfully");
+                if(debug)System.out.println(" --- '" + command + "' ran unsuccessfully");
                 return errOutput;
             }
         } catch (IOException | InterruptedException e) {
@@ -176,13 +176,11 @@ public class ProgramMutatorController {
 			}
 			
 			if(inClass) {
-				if(isLineMutatable(line)) {
+				if(LineMutator.isLineMutatable(line)) {
 					int lineNumber = i + 1;
-					if(InequalityHelper.lineHasInequality(line)) {
-						for(String mutatedLine : InequalityHelper.mutateLine(line)) {
-							new MutatedFile(lineNumber, mutatedLine);
-							if(debug)System.out.println("Mutated Line=> " + mutatedLine);
-						}
+					for(String mutatedLine : LineMutator.mutateLine(line)) {
+						new MutatedFile(lineNumber, mutatedLine);
+						if(debug)System.out.println("Mutated Line=> " + mutatedLine);
 					}
 				}
 			}
@@ -261,9 +259,5 @@ public class ProgramMutatorController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private boolean isLineMutatable(String line) {
-		return InequalityHelper.lineHasInequality(line);
 	}
 }

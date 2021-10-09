@@ -1,4 +1,4 @@
-package program.mutator.pojos;
+package program.mutator.pojos.enums;
 
 import java.util.Arrays;
 
