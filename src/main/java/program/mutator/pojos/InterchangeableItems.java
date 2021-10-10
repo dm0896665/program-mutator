@@ -11,13 +11,11 @@ public class InterchangeableItems {
 	public static final ArrayList<InterchangeableItem<?>> MUTATION_ITEMS = new ArrayList<InterchangeableItem<?>>();
 	
 	static {
-		addEnum(Inequalities.class);
-		addEnum(NumberTypes.class);
-        //ENUMS.add(new InterchangeableItem<Inequalities>(Inequalities.values()));
-        //ENUMS.add(new InterchangeableItem<NumberTypes>(NumberTypes.values()));
+		addMutableItem(Inequalities.class);
+		addMutableItem(NumberTypes.class);
     }
 	
-	private static <E extends MutationItem & MutationItemInterface> void addEnum(Class<E> e) {
+	private static <E extends MutationItem & MutationItemInterface> void addMutableItem(Class<E> e) {
 		try {
 			MUTATION_ITEMS.add(new InterchangeableItem<E>(e.newInstance().getValues()));
 		} catch (InstantiationException | IllegalAccessException e1) {
