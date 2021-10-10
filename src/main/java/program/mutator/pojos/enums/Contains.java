@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 public enum Contains {
 	EQUAL_SIGN("="),
-	DECIMAL_POINT(".");
+	DECIMAL_POINT("."),
+	NOTHING("");
 	
 	
 	String outputString;

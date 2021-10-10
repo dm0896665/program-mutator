@@ -21,13 +21,13 @@ public final class NumberTypes extends MutationItem implements MutationItemInter
 		values.add(new Value(
 				NumberType.DOUBLE.toString(), //value
 				Arrays.asList(Contains.EQUAL_SIGN.toString()), //must have
-				Arrays.asList(""), //can't have
+				Arrays.asList(Contains.NOTHING.toString()), //can't have
 				1)); //occurrences allowed
 		
 		values.add(new Value(
 				NumberType.FLOAT.toString(), //value
 				Arrays.asList(Contains.EQUAL_SIGN.toString()), //must have
-				Arrays.asList(""), //can't have
+				Arrays.asList(Contains.NOTHING.toString()), //can't have
 				1)); //occurrences allowed
 		
 		values.add(new Value(
