@@ -2,18 +2,18 @@ package program.mutator.pojos.enums.possible.mutation.items;
 
 import java.util.Arrays;
 
-public enum Inequalities {
+public enum Inequality {
 	EQUALS("=="),
 	NOT_EQUALS("!="),
 	GREATER_THAN_OR_EQUAL_TO(">="),
 	LESS_THAN_OR_EQUAL_TO("<="),
-	LESS_THAN(">"),
-	GREATER_THAN("<");
+	LESS_THAN("<"),
+	GREATER_THAN(">");
 	
 	
 	String outputString;
 	
-	Inequalities(String outputString) {
+	Inequality(String outputString) {
 		this.outputString = outputString;
 	}
 	
@@ -22,7 +22,7 @@ public enum Inequalities {
 		return this.outputString;
 	}
 	
-	public static Inequalities fromString(String outputString) {
-		return Arrays.stream(Inequalities.values()).filter(out -> out.outputString.equals(outputString)).findFirst().orElse(null);
+	public static Inequality fromString(String outputString) {
+		return Arrays.stream(Inequality.values()).filter(out -> out.outputString.equals(outputString)).findFirst().orElse(null);
 	}
 }

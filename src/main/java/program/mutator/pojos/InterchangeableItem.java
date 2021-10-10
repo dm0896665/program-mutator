@@ -1,24 +1,30 @@
 package program.mutator.pojos;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-public class InterchangeableItem<T extends Enum<T>> {
-	private ArrayList<String> itemsToInterchangeWith;
+import program.mutator.pojos.abstracts.MutationItem;
+import program.mutator.pojos.interfaces.MutationItemInterface;
+
+public class InterchangeableItem<T extends MutationItem & MutationItemInterface> {
+	private ArrayList<Value> itemsToInterchangeWith;
 	
-	public InterchangeableItem(T[] aValues) {
-		setItemsToInterchangeWith((ArrayList<String>) Arrays.asList(aValues).stream()
-				   .map(object -> Objects.toString(object, null))
-				   .collect(Collectors.toList()));
+	public InterchangeableItem(ArrayList<Value> values) {
+		setItemsToInterchangeWith(values);
 	}
 
-	public ArrayList<String> getItemsToInterchangeWith() {
+	public ArrayList<Value> getItemsToInterchangeWith() {
 		return itemsToInterchangeWith;
 	}
 
-	public void setItemsToInterchangeWith(ArrayList<String> itemsToInterchangeWith) {
+	public void setItemsToInterchangeWith(ArrayList<Value> itemsToInterchangeWith) {
 		this.itemsToInterchangeWith = itemsToInterchangeWith;
+	}
+
+	public ArrayList<String> getItemsToInterchangeWithValues() {
+		ArrayList<String> items = new ArrayList<String>();
+		itemsToInterchangeWith.forEach(item -> {
+			items.add(item.getOutputString());
+		});
+		return items;
 	}
 }
