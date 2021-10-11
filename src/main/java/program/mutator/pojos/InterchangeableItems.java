@@ -6,6 +6,7 @@ import program.mutator.pojos.abstracts.MutationItem;
 import program.mutator.pojos.interfaces.MutationItemInterface;
 import program.mutator.pojos.possible.mutation.items.Inequalities;
 import program.mutator.pojos.possible.mutation.items.NumberTypes;
+import program.mutator.pojos.possible.mutation.items.PrePostFixes;
 
 public class InterchangeableItems {
 	public static final ArrayList<InterchangeableItem<?>> MUTATION_ITEMS = new ArrayList<InterchangeableItem<?>>();
@@ -13,6 +14,7 @@ public class InterchangeableItems {
 	static {
 		addMutableItem(Inequalities.class);
 		addMutableItem(NumberTypes.class);
+		addMutableItem(PrePostFixes.class);
     }
 	
 	private static <E extends MutationItem & MutationItemInterface> void addMutableItem(Class<E> e) {

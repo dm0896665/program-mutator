@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import program.mutator.pojos.InterchangeableItem;
 import program.mutator.pojos.InterchangeableItems;
 import program.mutator.pojos.Value;
+import program.mutator.pojos.enums.AllowedOccurrences;
+import program.mutator.pojos.enums.possible.mutation.items.PrePostFix;
 
 public class LineMutator {
 	
@@ -21,7 +23,9 @@ public class LineMutator {
 		for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.MUTATION_ITEMS) {
 			for(Value changeableValue : interchangeableItem.getItemsToInterchangeWith()) {
 				String changeableItem = changeableValue.getOutputString();
-				if(line.contains(" " + changeableItem + " ") && changeableValue.changeableValueHasSpaceOnEitherSide(line, changeableItem) && changeableValue.hasShouldContain(line) && changeableValue.occursLessThanAllowedOccurrences(line)) {
+				if((line.contains(" " + changeableItem + " ") && changeableValue.changeableValueHasSpaceOnEitherSide(line, changeableItem) 
+						|| (line.contains(changeableItem) && (PrePostFix.INCREMENT.toString().equals(changeableItem) || PrePostFix.DECREMENT.toString().equals(changeableItem)))) 
+						&& changeableValue.hasShouldContain(line) && changeableValue.occursLessThanAllowedOccurrences(line)) {
 					changeableItems.add(changeableItem);
 				}
 			}
@@ -47,14 +51,18 @@ public class LineMutator {
 				
 				
 				for(Value mutatedInequality : itemToMutateWith){
-					if(mutatedInequality.getOccurrencesAllowed() > 1) {
+					if(mutatedInequality.getOccurrencesAllowed() > AllowedOccurrences.ONE.getInt()) {
 						for(int i = 1; i < InterchangeableItems.getValueFromString(itemToChange).countOccurancesOfValue(line) + 1; i++) {
 							if(!"".equals(changeNthOccurrence(line, itemToChange, i, mutatedInequality.getOutputString()))) {
 								mutatedLines.add(changeNthOccurrence(line, itemToChange, i, mutatedInequality.getOutputString()));
 							}
 						}
 					} else {
-						mutatedLines.add(line.replace(" " + itemToChange + " ", " " + mutatedInequality.getOutputString() + " "));
+						if(PrePostFix.INCREMENT.toString().equals(itemToChange) || PrePostFix.DECREMENT.toString().equals(itemToChange)) {
+							mutatedLines.add(line.replace(itemToChange, mutatedInequality.getOutputString()));
+						} else {
+							mutatedLines.add(line.replace(" " + itemToChange + " ", " " + mutatedInequality.getOutputString() + " "));
+						}
 					}
 				}
 			}
