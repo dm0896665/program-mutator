@@ -23,7 +23,7 @@ public class LineMutator {
 			for(Value changeableValue : interchangeableItem.getItemsToInterchangeWith()) {
 				String changeableItem = changeableValue.getOutputString();
 				if((line.contains(" " + changeableItem + " ") && changeableValue.changeableValueHasSpaceOnEitherSide(line, changeableItem) 
-						|| (line.contains(changeableItem) && Value.isNoSpaceItem(changeableItem))) 
+						|| (line.contains(changeableItem) && changeableValue.isNoSpaceItem())) 
 						&& changeableValue.hasShouldContain(line) && changeableValue.occursLessThanAllowedOccurrences(line)) {
 					changeableItems.add(changeableItem);
 				}
@@ -57,7 +57,7 @@ public class LineMutator {
 							}
 						}
 					} else {
-						if(Value.isNoSpaceItem(itemToChange)) {
+						if(mutatedInequality.isNoSpaceItem()) {
 							mutatedLines.add(line.replace(itemToChange, mutatedInequality.getOutputString()));
 						} else {
 							mutatedLines.add(line.replace(" " + itemToChange + " ", " " + mutatedInequality.getOutputString() + " "));
