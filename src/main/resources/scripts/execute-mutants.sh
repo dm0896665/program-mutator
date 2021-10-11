@@ -9,6 +9,7 @@ do
 	file=${file//$prefix/}
 	ending=.java
 	fileName=${file//$ending/}
+	find $prefix -type f -name "*.class" -delete
 	cd $prefix
 	javac $file
 	inputString=""

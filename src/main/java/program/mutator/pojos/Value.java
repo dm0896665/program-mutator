@@ -1,6 +1,7 @@
 package program.mutator.pojos;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Value {
@@ -99,6 +100,10 @@ public class Value {
             }
         }
         return count;
+	}
+
+	public boolean changeableValueHasSpaceOnEitherSide(String line, String changeableItem) {
+		return Arrays.asList(line.split(" ")).contains(changeableItem);
 	}
 
 	@Override

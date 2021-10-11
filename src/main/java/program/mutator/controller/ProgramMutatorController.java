@@ -36,8 +36,8 @@ public class ProgramMutatorController {
 	public ProgramMutatorController() {
 		//initialize inputs (will be done by gui
 		this.inputs.add(Arrays.asList("6"));
-		this.inputs.add(Arrays.asList("9"));
 		this.inputs.add(Arrays.asList("5"));
+		this.inputs.add(Arrays.asList("9"));
 		
 		//get lines from file
 		File f = fullProgramPath.toFile();
@@ -136,7 +136,7 @@ public class ProgramMutatorController {
 	}
 	
 	private String createCommand(List<String> inputs, boolean runOriginal) {
-		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/";
+		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/scripts/";
         String scriptName = ((runOriginal)? "execute-original" : "execute-mutants") + ".sh";
         String script = scriptPath + scriptName;
         String pathArg = ((runOriginal)? this.pathOfProgram : MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1));

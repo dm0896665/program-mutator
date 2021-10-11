@@ -7,6 +7,7 @@ ending=.java
 cd $filePath
 >&2 echo "$filePath"
 >&2 echo "$fileName$ending"
+find $filePath -type f -name "$fileName.class" -delete
 javac $fileName$ending
 inputString=""
 for input in "${inputs[@]:2}"

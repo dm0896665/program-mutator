@@ -96,7 +96,11 @@ public class MutatedFile {
 	}
 
 	public static ArrayList<String> getOriginalFileLines() {
-		return originalFileLines;
+		ArrayList<String> fileLines = new ArrayList<String>();
+		for(String fileLine : originalFileLines) {
+			fileLines.add(fileLine);
+		}
+		return fileLines;
 	}
 
 	public static void setOriginalFileLines(ArrayList<String> originalFileLines) {
@@ -106,10 +110,9 @@ public class MutatedFile {
 	public void mutate() {
 		try {
 			//get content of mutated file
-			this.mutatedFileLines = MutatedFile.originalFileLines;
+			this.mutatedFileLines = getOriginalFileLines();
 			this.mutatedFileLines.set(this.lineMutated - 1, this.mutatedLine);
 			StringBuilder mutatedFileContentStringBuilder = new StringBuilder();
-			
 			for(String mutatedLine : this.mutatedFileLines) {
 				if(!mutatedLine.startsWith("package")) {
 					if(mutatedLine.contains(originalFileName) && mutatedLine.contains("class")) {
