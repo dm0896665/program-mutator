@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import program.mutator.pojos.abstracts.MutationItem;
 import program.mutator.pojos.interfaces.MutationItemInterface;
+import program.mutator.pojos.possible.mutation.items.CompoundOperators;
 import program.mutator.pojos.possible.mutation.items.Inequalities;
 import program.mutator.pojos.possible.mutation.items.NumberTypes;
 import program.mutator.pojos.possible.mutation.items.PrePostFixes;
@@ -15,6 +16,7 @@ public class InterchangeableItems {
 		addMutableItem(Inequalities.class);
 		addMutableItem(NumberTypes.class);
 		addMutableItem(PrePostFixes.class);
+		addMutableItem(CompoundOperators.class);
     }
 	
 	private static <E extends MutationItem & MutationItemInterface> void addMutableItem(Class<E> e) {

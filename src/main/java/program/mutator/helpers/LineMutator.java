@@ -6,7 +6,6 @@ import program.mutator.pojos.InterchangeableItem;
 import program.mutator.pojos.InterchangeableItems;
 import program.mutator.pojos.Value;
 import program.mutator.pojos.enums.AllowedOccurrences;
-import program.mutator.pojos.enums.possible.mutation.items.PrePostFix;
 
 public class LineMutator {
 	
@@ -24,7 +23,7 @@ public class LineMutator {
 			for(Value changeableValue : interchangeableItem.getItemsToInterchangeWith()) {
 				String changeableItem = changeableValue.getOutputString();
 				if((line.contains(" " + changeableItem + " ") && changeableValue.changeableValueHasSpaceOnEitherSide(line, changeableItem) 
-						|| (line.contains(changeableItem) && (PrePostFix.INCREMENT.toString().equals(changeableItem) || PrePostFix.DECREMENT.toString().equals(changeableItem)))) 
+						|| (line.contains(changeableItem) && Value.isNoSpaceItem(changeableItem))) 
 						&& changeableValue.hasShouldContain(line) && changeableValue.occursLessThanAllowedOccurrences(line)) {
 					changeableItems.add(changeableItem);
 				}
@@ -58,7 +57,7 @@ public class LineMutator {
 							}
 						}
 					} else {
-						if(PrePostFix.INCREMENT.toString().equals(itemToChange) || PrePostFix.DECREMENT.toString().equals(itemToChange)) {
+						if(Value.isNoSpaceItem(itemToChange)) {
 							mutatedLines.add(line.replace(itemToChange, mutatedInequality.getOutputString()));
 						} else {
 							mutatedLines.add(line.replace(" " + itemToChange + " ", " " + mutatedInequality.getOutputString() + " "));
@@ -91,6 +90,4 @@ public class LineMutator {
         }
         return "";
     }
-	
-	
 }

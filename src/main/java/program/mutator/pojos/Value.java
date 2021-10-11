@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import program.mutator.pojos.possible.mutation.items.CompoundOperators;
+import program.mutator.pojos.possible.mutation.items.PrePostFixes;
+
 public class Value {
 	String outputString;
 	ArrayList<String> shouldContain;
@@ -104,6 +107,22 @@ public class Value {
 
 	public boolean changeableValueHasSpaceOnEitherSide(String line, String changeableItem) {
 		return Arrays.asList(line.split(" ")).contains(changeableItem);
+	}
+	
+	public static boolean isNoSpaceItem(String item) {
+		ArrayList<Value> noSpaceItems = new ArrayList<Value>();
+		try {
+			noSpaceItems.addAll(PrePostFixes.class.newInstance().getValues());
+			noSpaceItems.addAll(CompoundOperators.class.newInstance().getValues());
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		for(Value v : noSpaceItems) {
+			if(v.getOutputString().equals(item)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
