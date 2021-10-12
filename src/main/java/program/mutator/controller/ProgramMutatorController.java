@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import program.mutator.helpers.LineMutator;
+import program.mutator.helpers.VariableHelper;
 import program.mutator.pojos.ExpectedOutput;
 import program.mutator.pojos.MutatedFile;
 import program.mutator.pojos.MutatedFileOutput;
@@ -43,6 +44,8 @@ public class ProgramMutatorController {
 		File f = fullProgramPath.toFile();
 		getFileLinesFromFile(f);
 		MutatedFile.initializePaths(pathOfProgram, programName, programEnding);
+		VariableHelper.initializeVariables();
+		if(debug)VariableHelper.printVariables();
 		createRunnableOriginalProgram();
 		
 		//initialize outputs
@@ -158,6 +161,7 @@ public class ProgramMutatorController {
 			while (line != null) {
 				if(debug)System.out.println(line);
 				MutatedFile.originalFileLines.add(line);
+				VariableHelper.originalFileLines.add(line);
 				// read next line
 				line = reader.readLine();
 			}

@@ -6,7 +6,8 @@ public enum Contains {
 	EQUAL_SIGN("="),
 	DECIMAL_POINT("."),
 	NOTHING(""),
-	ZERO("0");
+	ZERO("0"),
+	ARRAY("[]");
 	
 	
 	String outputString;
