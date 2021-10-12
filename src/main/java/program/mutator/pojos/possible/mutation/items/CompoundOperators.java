@@ -11,7 +11,7 @@ import program.mutator.pojos.enums.SpaceRules;
 import program.mutator.pojos.enums.possible.mutation.items.CompoundOperator;
 import program.mutator.pojos.interfaces.MutationItemInterface;
 
-public class CompoundOperators extends MutationItem implements MutationItemInterface {
+public final class CompoundOperators extends MutationItem implements MutationItemInterface {
 	private static ArrayList<Value> values = new ArrayList<Value>();
 	static {
 		values.add(new Value(
