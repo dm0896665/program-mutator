@@ -1,23 +1,27 @@
 package program.mutator.pojos;
 
 import java.util.ArrayList;
+import java.util.Set;
+
+import org.reflections.Reflections;
 
 import program.mutator.pojos.abstracts.MutationItem;
 import program.mutator.pojos.interfaces.MutationItemInterface;
-import program.mutator.pojos.possible.mutation.items.CompoundOperators;
-import program.mutator.pojos.possible.mutation.items.Inequalities;
-import program.mutator.pojos.possible.mutation.items.NumberTypes;
-import program.mutator.pojos.possible.mutation.items.PrePostFixes;
 
 public class InterchangeableItems {
 	public static final ArrayList<InterchangeableItem<?>> MUTATION_ITEMS = new ArrayList<InterchangeableItem<?>>();
 	
 	static {
-		addMutableItem(Inequalities.class);
-		addMutableItem(NumberTypes.class);
-		addMutableItem(PrePostFixes.class);
-		addMutableItem(CompoundOperators.class);
+		addMutableItems();
     }
+	
+	private static void addMutableItems() {
+		 Reflections reflections = new Reflections("program.mutator.pojos.possible.mutation.items");
+
+		 Set<Class<? extends MutationItem>> allClasses = 
+		     reflections.getSubTypesOf(MutationItem.class);
+		 allClasses.forEach(clazz -> addMutableItem(clazz));
+	}
 	
 	private static <E extends MutationItem & MutationItemInterface> void addMutableItem(Class<E> e) {
 		try {

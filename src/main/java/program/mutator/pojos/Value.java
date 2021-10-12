@@ -7,12 +7,11 @@ import java.util.List;
 import program.mutator.pojos.enums.SpaceRules;
 
 public class Value {
-	String outputString;
-	ArrayList<String> shouldContain;
-	ArrayList<String> shouldNotContain;
-	SpaceRules shouldHaveSpaceOneEitherSide;
-
-	int occurrencesAllowed;
+	private String outputString;
+	private ArrayList<String> shouldContain;
+	private ArrayList<String> shouldNotContain;
+	private SpaceRules shouldHaveSpaceOneEitherSide;
+	private int occurrencesAllowed;
 	
 	
 
