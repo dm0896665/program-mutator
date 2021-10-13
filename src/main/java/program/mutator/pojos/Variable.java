@@ -6,12 +6,13 @@ public class Variable {
 	private String name;
 	private DataTypes dataType;
 	private String value;
+	private Scope scope;
 	
-	public Variable(String name, DataTypes dataType, String value) {
-		super();
+	public Variable(String name, DataTypes dataType, String value, Scope scope) {
 		this.name = name;
 		this.dataType = dataType;
 		this.value = value;
+		this.scope = scope;
 	}
 
 	public String getName() {
@@ -38,10 +39,16 @@ public class Variable {
 		this.value = value;
 	}
 
+	public Scope getScope() {
+		return scope;
+	}
+
+	public void setScope(Scope scope) {
+		this.scope = scope;
+	}
+
 	@Override
 	public String toString() {
-		return "Variable [name=" + name + ", dataType=" + dataType + ", value=" + value + "]";
+		return "Variable [name=" + name + ", dataType=" + dataType + ", value=" + value + ", scope=" + scope + "]";
 	}
-	
-	
 }

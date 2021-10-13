@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import program.mutator.pojos.InterchangeableItem;
 import program.mutator.pojos.InterchangeableItems;
+import program.mutator.pojos.Scope;
 import program.mutator.pojos.Value;
 import program.mutator.pojos.enums.AllowedOccurrences;
 
@@ -22,9 +23,7 @@ public class LineMutator {
 		for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.MUTATION_ITEMS) {
 			for(Value changeableValue : interchangeableItem.getItemsToInterchangeWith()) {
 				String changeableItem = changeableValue.getOutputString();
-				if((line.contains(" " + changeableItem + " ") && changeableValue.changeableValueHasSpaceOnEitherSide(line, changeableItem) 
-						|| (line.contains(changeableItem) && changeableValue.isNoSpaceItem())) 
-						&& changeableValue.hasShouldContain(line) && changeableValue.occursLessThanAllowedOccurrences(line)) {
+				if(changeableValue.isInLine(line)) {
 					changeableItems.add(changeableItem);
 				}
 			}
@@ -39,21 +38,32 @@ public class LineMutator {
 			for(String itemToChange : itemsToChange) {
 				ArrayList<Value> itemToMutateWith = new ArrayList<Value>();
 				for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.MUTATION_ITEMS) {
+					//if(itemToChange.equals("num"))System.out.println(interchangeableItem.getItemsToInterchangeWith());
 					if(itemToChangeIsInInterchangeableItem(interchangeableItem.getItemsToInterchangeWithValues(), itemToChange)) {
 						for(Value changeableItem : interchangeableItem.getItemsToInterchangeWith()) {
+							//System.out.println(!changeableItem.getOutputString().equals(itemToChange) + " vs " + !changeableItem.hasShouldNotContain(line) + " for -> " + changeableItem);
 							if(!changeableItem.getOutputString().equals(itemToChange) && !changeableItem.hasShouldNotContain(line)) {
-								 itemToMutateWith.add(changeableItem); 
+								//System.out.println("****************************added " + changeableItem);
+								if(changeableItem.getAttachments().size() > 1) {
+									if(changeableItem.getAttachments().get(1) instanceof Scope && ((Scope) changeableItem.getAttachments().get(1)).isInScope(VariableHelper.getLineNumberFromLine(line))) { //if it's a variable check to see if it's in scope first))
+										itemToMutateWith.add(changeableItem);
+									}
+								} else {
+									itemToMutateWith.add(changeableItem); 
+								}
 							}
 						}
 					}
 				}
-				
+				//System.out.println(" *changing*[" + itemToChange + "]: " + line + " => " + itemsToChange + itemToMutateWith);
 				
 				for(Value mutatedInequality : itemToMutateWith){
 					if(mutatedInequality.getOccurrencesAllowed() > AllowedOccurrences.ONE.getInt()) {
 						for(int i = 1; i < InterchangeableItems.getValueFromString(itemToChange).countOccurancesOfValue(line) + 1; i++) {
+							//System.out.println("here: '" + changeNthOccurrence(line, itemToChange, i, mutatedInequality.getOutputString()) + "'");
 							if(!"".equals(changeNthOccurrence(line, itemToChange, i, mutatedInequality.getOutputString()))) {
 								mutatedLines.add(changeNthOccurrence(line, itemToChange, i, mutatedInequality.getOutputString()));
+								//System.out.println("Place-------------> " + changeNthOccurrence(line, itemToChange, i, mutatedInequality.getOutputString()));
 							}
 						}
 					} else {
@@ -61,6 +71,7 @@ public class LineMutator {
 							mutatedLines.add(line.replace(itemToChange, mutatedInequality.getOutputString()));
 						} else {
 							mutatedLines.add(line.replace(" " + itemToChange + " ", " " + mutatedInequality.getOutputString() + " "));
+							//System.out.println(line.replace("Place==============> " + itemToChange, mutatedInequality.getOutputString()) + " " + mutatedInequality.getOutputString());
 						}
 					}
 				}
@@ -79,8 +90,10 @@ public class LineMutator {
         int start = 0;
         int occurences = 0;
         for(int end = subStr.length(); end < str.length(); end++){
-           if(str.substring(start, end).equals(subStr) && (str.charAt(start-1) == ' ') && (str.charAt(end) == ' ')){
-        	   //System.out.println("'" + str.charAt(start-1) + "' " + str.substring(start, end) + " '" + str.charAt(end) + "'");
+        	if(str.substring(start, end).equals(subStr) && 
+        		   (((str.charAt(start-1) == ' ') && (str.charAt(end) == ' ') && !VariableHelper.isAVariableName(subStr)) 
+        				   || (VariableHelper.isAVariableName(subStr) && Value.isJustTheItem(str, subStr, n)))){
+        	  //System.out.println("'" + str.charAt(start-1) + "' " + str.substring(start, end) + " '" + str.charAt(end) + "' -> " + subStr);
               occurences++;
            };
            if(occurences == n){

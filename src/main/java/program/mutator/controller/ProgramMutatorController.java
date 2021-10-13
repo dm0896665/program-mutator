@@ -173,6 +173,7 @@ public class ProgramMutatorController {
 	
 	private void createMutatedFiles() {
 		boolean inClass = false;
+		int count = 0;
 		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
 			String line = MutatedFile.originalFileLines.get(i);
 			if(line.contains("class")) {
@@ -184,11 +185,13 @@ public class ProgramMutatorController {
 					int lineNumber = i + 1;
 					for(String mutatedLine : LineMutator.mutateLine(line)) {
 						new MutatedFile(lineNumber, mutatedLine);
+						count++;
 						if(debug)System.out.println("Mutated Line=> " + mutatedLine);
 					}
 				}
 			}
 		}
+		if(debug)System.out.println("Total Number of Mutations: " + count);
 	}
 	
 	private void calculateMutationScoreFromOutput(ScriptOutput mutatedScriptOutput) {

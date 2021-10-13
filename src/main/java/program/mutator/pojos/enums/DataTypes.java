@@ -37,4 +37,8 @@ public enum DataTypes {
 	public static DataTypes fromString(String outputString) {
 		return Arrays.stream(DataTypes.values()).filter(out -> out.outputString.equals(outputString)).findFirst().orElse(null);
 	}
+	
+	public boolean equals(DataTypes type) {
+		return this.outputString.equals(type.toString());
+	}
 }

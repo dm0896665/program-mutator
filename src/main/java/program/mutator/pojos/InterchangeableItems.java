@@ -25,7 +25,9 @@ public class InterchangeableItems {
 	
 	private static <E extends MutationItem & MutationItemInterface> void addMutableItem(Class<E> e) {
 		try {
-			MUTATION_ITEMS.add(new InterchangeableItem<E>(e.newInstance().getValues()));
+			if(e.newInstance().getValues().size() > 0) {
+				MUTATION_ITEMS.add(new InterchangeableItem<E>(e.newInstance().getValues()));
+			}
 		} catch (InstantiationException | IllegalAccessException e1) {
 			e1.printStackTrace();
 		}
