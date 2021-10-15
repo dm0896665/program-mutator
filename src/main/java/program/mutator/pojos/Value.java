@@ -102,6 +102,9 @@ public class Value {
 					return false;
 				}
 				if(line.contains(value)) {
+					if(VariableHelper.isAVariableName(value) && !hasAtLeastOneOccurance(line, value)) {
+						return false;
+					}
 					return true;
 				}
 			}

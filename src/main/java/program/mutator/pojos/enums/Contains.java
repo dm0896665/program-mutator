@@ -7,7 +7,11 @@ public enum Contains {
 	DECIMAL_POINT("."),
 	NOTHING(""),
 	ZERO("0"),
-	ARRAY("[]");
+	ARRAY("[]"),
+	QUOTATION_MARK("\""),
+	STRING("String"),
+	SYSTEM_DOT_OUT("System.out"),
+	DOT_EQUALS(".equals(");
 	
 	
 	String outputString;

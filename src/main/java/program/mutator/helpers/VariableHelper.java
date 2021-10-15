@@ -125,6 +125,7 @@ public class VariableHelper {
 					AllowedOccurrences.UNLIMITED.getInt(), //occurrences allowed
 					Arrays.asList(variable.getDataType(), variable.getScope()))); //attachments
 		});
+		System.out.println("-----------------" + values);
 		InterchangeableItem<Variables> ici = new InterchangeableItem<Variables>(values);
 		InterchangeableItems.MUTATION_ITEMS.add(ici);
 	}

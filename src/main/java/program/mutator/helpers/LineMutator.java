@@ -55,7 +55,7 @@ public class LineMutator {
 						}
 					}
 				}
-				//System.out.println(" *changing*[" + itemToChange + "]: " + line + " => " + itemsToChange + itemToMutateWith);
+				System.out.println(" *changing*[" + itemToChange + "]: " + line + " => " + itemsToChange + itemToMutateWith);
 				
 				for(Value mutatedInequality : itemToMutateWith){
 					if(mutatedInequality.getOccurrencesAllowed() > AllowedOccurrences.ONE.getInt()) {
