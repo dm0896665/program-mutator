@@ -8,8 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+
+import program.mutator.pojos.user.TestCase;
+import program.mutator.pojos.user.UserInput;
 
 public class MutatedFile {
 	public static String filePath;
@@ -17,11 +21,13 @@ public class MutatedFile {
 	private static String originalFilePath;
 	private static String originalFileName;
 	public static String fileType;
-	private static int mutationNumber = 0;
+	public static int mutationNumber = 0;
 	private int lineMutated;
 	private String mutatedLine;
+	private static TestCase sampleInput;
 	public static ArrayList<String> originalFileLines = new ArrayList<String>();
 	public ArrayList<String> mutatedFileLines = new ArrayList<String>();
+	public static ArrayList<MutatedLine> mutatedLines = new ArrayList<MutatedLine>();
 	
 	/*MUST BE CALLED AT START OF PROCESS*/
 	public static void initializePaths(String originalPath, String programName, String fileType) {
@@ -29,13 +35,17 @@ public class MutatedFile {
 		MutatedFile.originalFileName = programName;
 		MutatedFile.fileType = fileType;
 		MutatedFile.filePath = MutatedFile.originalFilePath + "mutatedFiles/";
+		new File(MutatedFile.filePath).delete();
+		MutatedFile.mutationNumber = 0;
+		MutatedFile.mutatedLines = new ArrayList<MutatedLine>();
 	}
 	
-	public MutatedFile(int lineMutated, String mutatedLine) {
+	public MutatedFile(int lineMutated, String mutatedLine, TestCase sampleInput) {
 		MutatedFile.mutationNumber++;
 		this.fileName = "Mutation" + MutatedFile.mutationNumber;
 		this.lineMutated = lineMutated;
 		this.mutatedLine = mutatedLine;
+		MutatedFile.sampleInput = sampleInput;
 		mutate();
 	}
 
@@ -112,6 +122,7 @@ public class MutatedFile {
 			//get content of mutated file
 			this.mutatedFileLines = getOriginalFileLines();
 			this.mutatedFileLines.set(this.lineMutated - 1, this.mutatedLine);
+			MutatedFile.mutatedLines.add(new MutatedLine(this.mutatedLine, this.lineMutated));
 			StringBuilder mutatedFileContentStringBuilder = new StringBuilder();
 			for(String mutatedLine : this.mutatedFileLines) {
 				if(!mutatedLine.startsWith("package")) {
@@ -138,8 +149,30 @@ public class MutatedFile {
 	        writer.write(String.valueOf(mutatedFileContentStringBuilder));
 	        writer.flush();
 	        writer.close();
+	        if(!UserInput.willFileRunWell(path.toString(), MutatedFile.sampleInput)) {
+	        	path.toFile().delete();
+	        	new File(MutatedFile.filePath + this.fileName + ".class").delete();
+	        	MutatedFile.mutatedLines.remove(MutatedFile.mutatedLines.size()-1);
+	    		MutatedFile.mutationNumber--;
+	        }
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void condenseFileNumber(int numberOfMutations) {
+		new File(MutatedFile.filePath).delete();
+		int numberToRemove = MutatedFile.mutationNumber - numberOfMutations;
+		MutatedFile.mutationNumber = 0;
+		ArrayList<MutatedLine> newLines = new ArrayList<MutatedLine>(MutatedFile.mutatedLines);
+		MutatedFile.mutatedLines = new ArrayList<MutatedLine>();
+		
+		for(int i = 0; i < numberToRemove; i++) {
+			newLines.remove(new Random().nextInt(newLines.size()));
+		}
+		
+		for(MutatedLine line : newLines) {
+			new MutatedFile(line.getLineNumber(), line.getLine(), sampleInput);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package program.mutator.pojos;
+package program.mutator.pojos.item.swapping;
 
 import java.util.ArrayList;
 import java.util.Arrays;

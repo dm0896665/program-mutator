@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import program.mutator.controller.ProgramMutatorController;
+import program.mutator.pojos.user.UserInput;
 
 public class App extends Application
 {
@@ -36,7 +37,15 @@ public class App extends Application
 		{
 			//launch application
 			//launch(args);
-			
-			new ProgramMutatorController();
+			while(true) {
+				UserInput input = new UserInput();
+				new ProgramMutatorController(input);
+				try {
+					System.out.println("\nRefreshing Process...");
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 }

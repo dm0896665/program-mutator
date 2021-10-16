@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import program.mutator.pojos.InterchangeableItem;
-import program.mutator.pojos.InterchangeableItems;
-import program.mutator.pojos.Scope;
-import program.mutator.pojos.Value;
-import program.mutator.pojos.Variable;
 import program.mutator.pojos.enums.AllowedOccurrences;
 import program.mutator.pojos.enums.Contains;
 import program.mutator.pojos.enums.DataTypes;
 import program.mutator.pojos.enums.SpaceRules;
+import program.mutator.pojos.item.swapping.InterchangeableItem;
+import program.mutator.pojos.item.swapping.InterchangeableItems;
+import program.mutator.pojos.item.swapping.Value;
 import program.mutator.pojos.possible.mutation.items.Variables;
+import program.mutator.pojos.variable.Scope;
+import program.mutator.pojos.variable.Variable;
 
 public class VariableHelper {
 
@@ -49,7 +49,7 @@ public class VariableHelper {
 							}
 						}
 					}
-					variables.add(new Variable(name, DataTypes.fromString(dataType), value, new Scope(getLineNumberFromLine(line))));
+					variables.add(new Variable(name.replace("[", "").replace("]", ""), DataTypes.fromString(dataType + (name.contains("[")? Contains.ARRAY.toString() : "")), value, new Scope(getLineNumberFromLine(line))));
 					break;
 				}
 			}
@@ -67,7 +67,7 @@ public class VariableHelper {
 				Variable variable = variables.get(i);
 				if(variable.getScope().getEnd() == 0) {
 					Variable scopedVariable = variable;
-					if(Value.hasAtLeastOneOccurance(line, variable.getName())) {
+					if(Value.hasAtLeastOneOccurance(line, variable.getName()) && scopedVariable.getScope().getStart() <= getLineNumberFromLine(line)) {
 						int lineBeforeIndex = getLineNumberFromLine(line) - 2;
 						int lineIndex = getLineNumberFromLine(line) - 1;
 						int lineAfterIndex = getLineNumberFromLine(line);
@@ -81,7 +81,7 @@ public class VariableHelper {
 						
 						int openCount = 1;
 						int startAt = lineAfterIndex;
-						if(lineAfter.contains("{") && (line.contains("for") || line.contains("if"))) {
+						if(lineAfter.contains("{") && (line.contains("for") || line.contains("if")) && !line.contains("{")) {
 							startAt++;
 						}
 						for(int j = startAt; j < originalFileLines.size(); j++) {
@@ -125,7 +125,6 @@ public class VariableHelper {
 					AllowedOccurrences.UNLIMITED.getInt(), //occurrences allowed
 					Arrays.asList(variable.getDataType(), variable.getScope()))); //attachments
 		});
-		System.out.println("-----------------" + values);
 		InterchangeableItem<Variables> ici = new InterchangeableItem<Variables>(values);
 		InterchangeableItems.MUTATION_ITEMS.add(ici);
 	}

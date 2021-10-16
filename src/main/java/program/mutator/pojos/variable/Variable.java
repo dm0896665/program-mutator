@@ -1,4 +1,4 @@
-package program.mutator.pojos;
+package program.mutator.pojos.variable;
 
 import program.mutator.pojos.enums.DataTypes;
 

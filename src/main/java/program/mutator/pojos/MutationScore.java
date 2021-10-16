@@ -43,6 +43,9 @@ public class MutationScore {
 	public void setTotalMutants(int totalMutants) {
 		this.totalMutants = totalMutants;
 	}
+	private void addTotalMutants(int count) {
+		this.totalMutants+=count;
+	}
 	public int getEquivalentMutants() {
 		return equivalentMutants;
 	}
@@ -53,12 +56,23 @@ public class MutationScore {
 		this.equivalentMutants+=count;
 		this.totalMutants+=count;
 	}
-	public void calculateOriginalScore() {
+	public void removeEquivalentMutants(int count) {
+		this.equivalentMutants-=count;
+	}
+	private void resetCounts() {
+		this.deadMutants = 0;
+		this.equivalentMutants = 0;
+		this.totalMutants = 0;
+	}
+	public void calculateScore() {
+		resetCounts();
 		mutationStatuses.forEach(mutation -> {
 			if(mutation.equals(MutationStatus.DEAD)) {
 				addDeadMutants(1);
-			} else {
+			} else if(!mutation.equals(MutationStatus.KILLABLE)){
 				addEquivalentMutants(1);
+			} else {
+				addTotalMutants(1);
 			}
 		});
 		this.score = 100 * ((double) this.deadMutants / (double)(this.totalMutants - this.equivalentMutants));

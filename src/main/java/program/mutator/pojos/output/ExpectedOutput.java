@@ -1,4 +1,4 @@
-package program.mutator.pojos;
+package program.mutator.pojos.output;
 
 import java.util.ArrayList;
 

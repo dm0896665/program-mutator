@@ -2,11 +2,11 @@ package program.mutator.helpers;
 
 import java.util.ArrayList;
 
-import program.mutator.pojos.InterchangeableItem;
-import program.mutator.pojos.InterchangeableItems;
-import program.mutator.pojos.Scope;
-import program.mutator.pojos.Value;
 import program.mutator.pojos.enums.AllowedOccurrences;
+import program.mutator.pojos.item.swapping.InterchangeableItem;
+import program.mutator.pojos.item.swapping.InterchangeableItems;
+import program.mutator.pojos.item.swapping.Value;
+import program.mutator.pojos.variable.Scope;
 
 public class LineMutator {
 	
@@ -55,7 +55,7 @@ public class LineMutator {
 						}
 					}
 				}
-				System.out.println(" *changing*[" + itemToChange + "]: " + line + " => " + itemsToChange + itemToMutateWith);
+				//System.out.println(" *changing*[" + itemToChange + "]: " + line + " => " + itemsToChange + itemToMutateWith);
 				
 				for(Value mutatedInequality : itemToMutateWith){
 					if(mutatedInequality.getOccurrencesAllowed() > AllowedOccurrences.ONE.getInt()) {

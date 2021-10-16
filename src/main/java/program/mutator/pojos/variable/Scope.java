@@ -1,4 +1,4 @@
-package program.mutator.pojos;
+package program.mutator.pojos.variable;
 
 public class Scope {
 	private int start;
