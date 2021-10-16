@@ -22,7 +22,7 @@ import program.mutator.pojos.MutatedFile;
 import program.mutator.pojos.enums.ScriptRunOutput;
 
 public class UserInput {
-	private static final String CONFIG_PATH = (System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/properties/config.properties");
+	private static final String CONFIG_PATH = (System.getProperty("user.dir").replace("\\", "/") + "/resources/properties/config.properties");
 	public static String bashPath;
 	private static String pathOfProgram;
 	private static String programName;
@@ -275,7 +275,7 @@ public class UserInput {
 	private static String createCommand(String file, TestCase testCase) {
 		boolean runOriginal = file.contains(UserInput.programName);
 		String programName = (new File(file).getName().split("\\.")[0] + ((runOriginal)? "Original" : ""));
-		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/scripts/";
+		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/resources/scripts/";
         String scriptName = "test-file.sh";
         String script = scriptPath + scriptName;
         String pathArg = ((runOriginal)? UserInput.pathOfProgram : MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1));

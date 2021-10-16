@@ -9,13 +9,13 @@ import program.mutator.pojos.abstracts.MutationItem;
 import program.mutator.pojos.interfaces.MutationItemInterface;
 
 public class InterchangeableItems {
-	public static final ArrayList<InterchangeableItem<?>> MUTATION_ITEMS = new ArrayList<InterchangeableItem<?>>();
+	public static ArrayList<InterchangeableItem<?>> mutationItems = new ArrayList<InterchangeableItem<?>>();
 	
 	static {
 		addMutableItems();
     }
 	
-	private static void addMutableItems() {
+	public static void addMutableItems() {
 		 Reflections reflections = new Reflections("program.mutator.pojos.possible.mutation.items");
 
 		 Set<Class<? extends MutationItem>> allClasses = 
@@ -26,7 +26,7 @@ public class InterchangeableItems {
 	private static <E extends MutationItem & MutationItemInterface> void addMutableItem(Class<E> e) {
 		try {
 			if(e.newInstance().getValues().size() > 0) {
-				MUTATION_ITEMS.add(new InterchangeableItem<E>(e.newInstance().getValues()));
+				mutationItems.add(new InterchangeableItem<E>(e.newInstance().getValues()));
 			}
 		} catch (InstantiationException | IllegalAccessException e1) {
 			e1.printStackTrace();
@@ -34,7 +34,7 @@ public class InterchangeableItems {
 	}
 	
 	public static Value getValueFromString(String item) {
-		for(InterchangeableItem<?> interchangeableItem : MUTATION_ITEMS) {
+		for(InterchangeableItem<?> interchangeableItem : mutationItems) {
 			for(Value v : interchangeableItem.getItemsToInterchangeWith()) {
 				if(v.getOutputString().equals(item)){
 					return v;

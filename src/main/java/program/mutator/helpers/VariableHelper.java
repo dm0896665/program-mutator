@@ -26,6 +26,9 @@ public class VariableHelper {
 
 	/*MUST BE CALLED AT START OF PROCESS*/
 	public static void initializeVariables() {
+		variables = new ArrayList<Variable>();
+		InterchangeableItems.mutationItems =  new ArrayList<InterchangeableItem<?>>();
+		InterchangeableItems.addMutableItems();
 		ArrayList<String> dataTypes = new ArrayList<String>();
 		Arrays.asList(DataTypes.values()).forEach(dataType -> dataTypes.add(dataType.toString()));
 		for(String line : originalFileLines) {
@@ -126,7 +129,7 @@ public class VariableHelper {
 					Arrays.asList(variable.getDataType(), variable.getScope()))); //attachments
 		});
 		InterchangeableItem<Variables> ici = new InterchangeableItem<Variables>(values);
-		InterchangeableItems.MUTATION_ITEMS.add(ici);
+		InterchangeableItems.mutationItems.add(ici);
 	}
 	
 	public static void printVariables() {

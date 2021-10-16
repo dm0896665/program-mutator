@@ -26,7 +26,7 @@ public class ProgramMutatorController {
 	private String programName;
 	private String programEnding;
 	private TestSet inputs = new TestSet();
-	private ArrayList<ExpectedOutput> expected = new ArrayList<ExpectedOutput>(); //e.g. Arrays.asList("6 is not a prime number.", "9 is not a prime number.", "5 is a prime number.")
+	private ArrayList<ExpectedOutput> expected = new ArrayList<ExpectedOutput>();
 	private boolean debug = true;
 	
 	public ProgramMutatorController(UserInput input) {
@@ -171,7 +171,7 @@ public class ProgramMutatorController {
 	}
 	
 	private String createCommand(List<Object> inputs, boolean runOriginal) {
-		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/scripts/";
+		String scriptPath = System.getProperty("user.dir").replace("\\", "/") + "/resources/scripts/";
         String scriptName = ((runOriginal)? "execute-original" : "execute-mutants") + ".sh";
         String script = scriptPath + scriptName;
         String pathArg = ((runOriginal)? this.pathOfProgram : MutatedFile.filePath.substring(0, MutatedFile.filePath.length() - 1));
@@ -221,6 +221,7 @@ public class ProgramMutatorController {
 	}
 	
 	private void findExpectedOutputFromOriginalScripOutput(ScriptOutput originalScriptOutput) {
+		expected = new ArrayList<ExpectedOutput>();
 		for(int i = 0; i < originalScriptOutput.getTestCaseOutputs().size(); i++) {
 			TestCaseOutput testCaseOutput = originalScriptOutput.getTestCaseOutputs().get(i);
 			for(MutatedFileOutput mutatedFileOutput : testCaseOutput.getMutatedFileOutput()) {

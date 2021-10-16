@@ -9,6 +9,7 @@ cd $filePath
 >&2 echo "$fileName$ending"
 find $filePath -type f -name "$fileName.class" -delete
 javac $fileName$ending
+>&2 echo $(java -version)
 >&2 echo $(ls)
 inputString=""
 for input in "${inputs[@]:2}"

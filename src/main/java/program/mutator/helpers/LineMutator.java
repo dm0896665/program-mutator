@@ -20,7 +20,7 @@ public class LineMutator {
 	public static ArrayList<String> lineContainsWhichChangeableItems(String line) {
 		line = line.toLowerCase();
 		ArrayList<String> changeableItems = new ArrayList<String>();
-		for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.MUTATION_ITEMS) {
+		for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.mutationItems) {
 			for(Value changeableValue : interchangeableItem.getItemsToInterchangeWith()) {
 				String changeableItem = changeableValue.getOutputString();
 				if(changeableValue.isInLine(line)) {
@@ -37,7 +37,7 @@ public class LineMutator {
 			ArrayList<String> mutatedLines = new ArrayList<String>();
 			for(String itemToChange : itemsToChange) {
 				ArrayList<Value> itemToMutateWith = new ArrayList<Value>();
-				for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.MUTATION_ITEMS) {
+				for(InterchangeableItem<?> interchangeableItem : InterchangeableItems.mutationItems) {
 					//if(itemToChange.equals("num"))System.out.println(interchangeableItem.getItemsToInterchangeWith());
 					if(itemToChangeIsInInterchangeableItem(interchangeableItem.getItemsToInterchangeWithValues(), itemToChange)) {
 						for(Value changeableItem : interchangeableItem.getItemsToInterchangeWith()) {
