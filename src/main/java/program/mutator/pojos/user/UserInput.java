@@ -352,15 +352,8 @@ public class UserInput {
 		boolean inClass = false;
 		for(int i = 0; i < MutatedFile.originalFileLines.size(); i++) {
 			String line = MutatedFile.originalFileLines.get(i);
-			if(line.contains(".next") || line.contains(".read")) {
-				for(int j = i + 1; j < MutatedFile.originalFileLines.size(); j++) {
-					String nextLine = MutatedFile.originalFileLines.get(j);
-					if(nextLine.contains(".next") || nextLine.contains(".read")) {
-						inClass = false;
-						break;
-					}
-					inClass = true;
-				}
+			if(line.contains(programName) && line.contains("class")) {
+				inClass = true;
 			}
 			
 			if(inClass) {
