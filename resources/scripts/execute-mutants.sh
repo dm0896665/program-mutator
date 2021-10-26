@@ -2,6 +2,8 @@
 
 filepath=$1
 inputs=("$@")
+cd "$filepath" && \
+find . -name '*.class' -exec rm -f {} \;
 for file in "$filepath"/*
 do
 	path="$file"
