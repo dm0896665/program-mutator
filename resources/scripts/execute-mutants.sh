@@ -24,5 +24,5 @@ do
 	
 	echo "Running New File"
 	
-	timeout 1s echo -ne "$inputString" |java $fileName
+	echo -ne "$inputString" | timeout 1 java $fileName
 done

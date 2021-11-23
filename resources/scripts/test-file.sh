@@ -20,4 +20,4 @@ done
 >&2 echo "$inputString"
 echo "Running New File"
 
-timeout 0.1 echo -ne "$inputString" |java $fileName
+echo -ne "$inputString" | timeout 1 java $fileName
