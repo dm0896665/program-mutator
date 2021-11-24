@@ -111,7 +111,7 @@ public class ProgramMutatorController {
 			} 
 			int count = 0;
 			for(String out : output) {
-				if(ScriptRunOutput.RUNNING_NEW_FILE.toString().equals(out)) {
+				if(out.contains(ScriptRunOutput.RUNNING_NEW_FILE.toString())) {
 					count++;
 					scriptOutput.getTestCaseOutputs().get(i).getMutatedFileOutput().add(new MutatedFileOutput());
 				} else {
